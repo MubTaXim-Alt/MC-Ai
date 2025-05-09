@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", // Target modern ES version
+    "module": "NodeNext", // Output ES modules compatible with Node.js
+    "moduleResolution": "NodeNext", // Use Node.js's module resolution strategy
+    "outDir": "./dist",
+    "rootDir": "./", // Root directory of your source files
+    "strict": true,
+    "esModuleInterop": true, // Still useful for some CJS dependencies
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "sourceMap": true, // Optional: for better debugging
+    "paths": {
+      "@bot/*": ["./bot/*"]
+    },
+    "baseUrl": "."
+  },
+  "include": ["bot/**/*.ts", "server.ts"],
+  "exclude": ["node_modules", "src", "dist/src", "vite.config.ts", "public", "dist/assets"]
+}
