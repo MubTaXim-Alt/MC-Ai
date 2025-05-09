@@ -14,7 +14,7 @@ export const config = {
     apiKey: process.env.GEMINI_API_KEY || 'AIzaSyBoJwR_EXgX60irvbPAtCO1_YMxAoXIftM',
   },
   botSettings: {
-    chatPrefix: 'Suva',
+    chatPrefix: '!',
     randomMessageIntervalWithPlayers: 10 * 60 * 1000, // 10 minutes
     randomMessageIntervalWithoutPlayers: 3 * 60 * 1000, // 3 minutes
     aiMessageCheckInterval: 30 * 1000, // How often to check if it's time for an AI message (e.g., every 30 seconds)
