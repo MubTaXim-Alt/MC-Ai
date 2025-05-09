@@ -1,9 +1,9 @@
 import mineflayer from 'mineflayer';
-import { config } from './config';
-import { initAntiAfk } from './actions';
-import { getChatResponse, initPeriodicAiMessages, stopPeriodicAiMessages } from './ai';
-import { recordBotAction, clearRecentBotActions } from './memory';
-import { clearAllPlayerMemory } from './playerMemory'; // Import player memory clearing function
+import { config } from './config.js';
+import { initAntiAfk } from './actions.js';
+import { getChatResponse, initPeriodicAiMessages, stopPeriodicAiMessages } from './ai.js';
+import { recordBotAction, clearRecentBotActions } from './memory.js';
+import { clearAllPlayerMemory } from './playerMemory.js'; // Import player memory clearing function
 
 console.log('Starting Suva Bot...');
 

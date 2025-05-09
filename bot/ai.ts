@@ -1,9 +1,9 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import { Bot } from 'mineflayer';
 import { Item as MinecraftDataItem } from 'minecraft-data'; // Changed Item import
-import { config } from './config';
-import { getRecentBotActionsSummary } from './memory';
-import { getPlayerChatContext, recordPlayerMessage } from './playerMemory'; // Import player memory functions
+import { config } from './config.js';
+import { getRecentBotActionsSummary } from './memory.js';
+import { getPlayerChatContext, recordPlayerMessage } from './playerMemory.js'; // Import player memory functions
 
 let genAI: GoogleGenerativeAI | null = null;
 

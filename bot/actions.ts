@@ -1,5 +1,5 @@
 import { Bot } from 'mineflayer';
-import { recordBotAction } from './memory'; // Import memory function
+import { recordBotAction } from './memory.js'; // Import memory function
 
 export function initAntiAfk(bot: Bot, interval: number) {
   setInterval(() => {
