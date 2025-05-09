@@ -72,7 +72,7 @@ function createBotInstance() {
     console.error(`Suva was kicked for: ${reason} (loggedIn: ${loggedIn})`);
     stopPeriodicAiMessages();
     console.log('Attempting to reconnect in 30 seconds...');
-    setTimeout(createBotInstance, 30000);
+    setTimeout(createBotInstance, 5000);
   });
 
   bot.on('error', (err) => {
@@ -80,7 +80,7 @@ function createBotInstance() {
     if (err.message.includes('ECONNREFUSED') || err.message.includes('ETIMEDOUT') || err.message.includes('ECONNRESET')) {
         stopPeriodicAiMessages();
         console.log('Connection error. Attempting to reconnect in 60 seconds...');
-        setTimeout(createBotInstance, 60000);
+        setTimeout(createBotInstance, 5000);
     }
   });
 
@@ -88,7 +88,7 @@ function createBotInstance() {
     console.log(`Bot disconnected. Reason: ${reason}.`);
     stopPeriodicAiMessages();
     console.log('Attempting to reconnect in 30 seconds...');
-    setTimeout(createBotInstance, 30000);
+    setTimeout(createBotInstance, 5000);
   });
   
   let lastPosition = bot.entity?.position.clone();
