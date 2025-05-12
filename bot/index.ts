@@ -84,16 +84,16 @@ function createBotInstance() {
 
   bot.on('kicked', (reason, loggedIn) => {
     const kickedUsername = botOptions.username; // Username that was kicked
+    // JSON.stringify is safe for logging complex objects or various types.
     console.error(`Bot (${kickedUsername}) was kicked. Reason: ${JSON.stringify(reason)}. LoggedIn: ${loggedIn}`);
     stopPeriodicAiMessages();
     
-    let kickReasonString = "";
-    if (typeof reason === 'string') {
-        kickReasonString = reason;
-    } else if (reason && typeof reason.toString === 'function') {
-        kickReasonString = reason.toString();
+    let kickReasonString: string;
+    // Use String() for robust conversion. It handles null, undefined, strings, and objects with .toString()
+    if (reason === null || reason === undefined) {
+        kickReasonString = "Reason not provided";
     } else {
-        kickReasonString = JSON.stringify(reason);
+        kickReasonString = String(reason); // This will call .toString() on ChatMessage objects
     }
 
     const isIdleBan = kickReasonString.toLowerCase().includes("banned") && 
