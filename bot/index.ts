@@ -7,9 +7,8 @@ import { clearAllPlayerMemory } from './playerMemory.js';
 
 console.log('Starting Suva Bot...');
 
-// Store the original username from config to use as a base
 const baseUsername = config.minecraft.username;
-let usernameSuffix = 0; // Start with 0, so first username is baseUsername, then baseUsername1, etc.
+let currentBotUsername = baseUsername; // Stores the username for the current/next connection attempt
 
 const botOptions: mineflayer.BotOptions = {
   host: config.minecraft.host,
@@ -24,17 +23,24 @@ const botOptions: mineflayer.BotOptions = {
 
 let mineflayer_bot: mineflayer.Bot | null = null;
 
+function generateRandomString(length: number): string {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
+
 function createBotInstance() {
-  // Dynamically set the username for this connection attempt
-  const currentUsername = usernameSuffix === 0 ? baseUsername : `${baseUsername}${usernameSuffix}`;
-  botOptions.username = currentUsername; // Update the username in botOptions
+  botOptions.username = currentBotUsername; // Set the username for this connection attempt
 
   console.log(`Attempting to connect as ${botOptions.username}...`);
   const bot = mineflayer.createBot(botOptions);
   mineflayer_bot = bot;
 
   bot.on('login', () => {
-    // bot.username will reflect the actual username used for login
     console.log(`Suva (as ${bot.username}) logged in to ${config.minecraft.host}:${config.minecraft.port}`);
     bot.chat(`Suva (as ${bot.username}) is online! Hello everyone! Type "${config.botSettings.chatPrefix} help" for assistance.`);
     
@@ -77,18 +83,16 @@ function createBotInstance() {
   });
 
   bot.on('kicked', (reason, loggedIn) => {
-    // botOptions.username reflects the name used for the connection attempt that got kicked
-    console.error(`Bot (${botOptions.username}) was kicked. Reason: ${JSON.stringify(reason)}. LoggedIn: ${loggedIn}`);
+    const kickedUsername = botOptions.username; // Username that was kicked
+    console.error(`Bot (${kickedUsername}) was kicked. Reason: ${JSON.stringify(reason)}. LoggedIn: ${loggedIn}`);
     stopPeriodicAiMessages();
     
     let kickReasonString = "";
     if (typeof reason === 'string') {
         kickReasonString = reason;
     } else if (reason && typeof reason.toString === 'function') {
-        // Handles Mineflayer's ChatMessage object
         kickReasonString = reason.toString();
     } else {
-        // Fallback for other types, though typically it's a string or ChatMessage
         kickReasonString = JSON.stringify(reason);
     }
 
@@ -96,27 +100,32 @@ function createBotInstance() {
                       kickReasonString.toLowerCase().includes("idle for too long");
 
     if (isIdleBan) {
-      usernameSuffix++;
-      console.log(`Bot was banned for idling. Will attempt to rejoin as ${baseUsername}${usernameSuffix} in 30 seconds...`);
+      const randomSuffix = generateRandomString(4);
+      currentBotUsername = `${baseUsername}_${randomSuffix}`; // Update for the next attempt
+      console.log(`Bot (${kickedUsername}) was banned for idling. Will attempt to rejoin as ${currentBotUsername} in 30 seconds...`);
     } else {
-      console.log(`Bot was kicked for a non-idle reason. Will attempt to reconnect in 30 seconds (using username: ${baseUsername}${usernameSuffix > 0 ? usernameSuffix : ''})...`);
+      // For non-idle kicks, currentBotUsername is not changed by this block,
+      // so it will retry with the same name it was using (which is already in currentBotUsername).
+      console.log(`Bot (${kickedUsername}) was kicked for a non-idle reason. Will attempt to reconnect in 30 seconds (using username: ${currentBotUsername})...`);
     }
     setTimeout(createBotInstance, 30000); // 30 seconds reconnect delay
   });
 
   bot.on('error', (err) => {
-    console.error(`Bot (${botOptions.username}) encountered an error:`, err);
+    const errorUsername = botOptions.username; // Username that encountered error
+    console.error(`Bot (${errorUsername}) encountered an error:`, err);
     stopPeriodicAiMessages();
-    const nextAttemptUsername = usernameSuffix === 0 ? baseUsername : `${baseUsername}${usernameSuffix}`;
-    console.log(`Connection error or other bot error. Attempting to reconnect in 60 seconds (will use username: ${nextAttemptUsername})...`);
+    // currentBotUsername already holds the name for the next attempt
+    console.log(`Connection error or other bot error. Attempting to reconnect in 60 seconds (will use username: ${currentBotUsername})...`);
     setTimeout(createBotInstance, 60000); // 60 seconds for general errors
   });
 
   bot.on('end', (reason) => {
-    console.log(`Bot (${botOptions.username}) disconnected. Reason: ${reason}.`);
+    const endedUsername = botOptions.username; // Username that disconnected
+    console.log(`Bot (${endedUsername}) disconnected. Reason: ${reason}.`);
     stopPeriodicAiMessages();
-    const nextAttemptUsername = usernameSuffix === 0 ? baseUsername : `${baseUsername}${usernameSuffix}`;
-    console.log(`Attempting to reconnect in 30 seconds (will use username: ${nextAttemptUsername})...`);
+    // currentBotUsername already holds the name for the next attempt
+    console.log(`Attempting to reconnect in 30 seconds (will use username: ${currentBotUsername})...`);
     setTimeout(createBotInstance, 30000); // 30 seconds for general disconnects
   });
   
@@ -144,7 +153,6 @@ function createBotInstance() {
 
   bot.once('end', () => {
     clearInterval(antiStuckInterval);
-    // stopPeriodicAiMessages(); // Already called in the 'end' handler
   });
 }
 
