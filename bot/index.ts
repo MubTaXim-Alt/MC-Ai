@@ -108,7 +108,7 @@ function createBotInstance() {
       // so it will retry with the same name it was using (which is already in currentBotUsername).
       console.log(`Bot (${kickedUsername}) was kicked for a non-idle reason. Will attempt to reconnect in 30 seconds (using username: ${currentBotUsername})...`);
     }
-    setTimeout(createBotInstance, 30000); // 30 seconds reconnect delay
+    setTimeout(createBotInstance, 5000); // 5 seconds reconnect delay
   });
 
   bot.on('error', (err) => {
@@ -117,7 +117,7 @@ function createBotInstance() {
     stopPeriodicAiMessages();
     // currentBotUsername already holds the name for the next attempt
     console.log(`Connection error or other bot error. Attempting to reconnect in 60 seconds (will use username: ${currentBotUsername})...`);
-    setTimeout(createBotInstance, 60000); // 60 seconds for general errors
+    setTimeout(createBotInstance, 5000); // 5 seconds for general errors
   });
 
   bot.on('end', (reason) => {
@@ -126,7 +126,7 @@ function createBotInstance() {
     stopPeriodicAiMessages();
     // currentBotUsername already holds the name for the next attempt
     console.log(`Attempting to reconnect in 30 seconds (will use username: ${currentBotUsername})...`);
-    setTimeout(createBotInstance, 30000); // 30 seconds for general disconnects
+    setTimeout(createBotInstance, 5000); // 5 seconds for general disconnects
   });
   
   let lastPosition = bot.entity?.position.clone();
